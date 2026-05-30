@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rapapa POS & Inventaris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.394.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 min-h-screen">
+    <div class="fixed inset-x-0 top-0 z-40 bg-slate-950/95 border-b border-slate-800 backdrop-blur">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.28em] text-emerald-400">Aplikasi Toko Kecil</p>
+          <h1 class="text-2xl font-semibold text-white">Rapapa POS & Inventaris</h1>
+          <p class="mt-1 text-slate-400">Dashboard ringkas, transaksi cepat, inventaris cerdas.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btnSettings" class="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 px-4 py-2 text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Pengaturan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="mx-auto mt-28 max-w-7xl px-4 pb-24 sm:px-6">
+      <section class="grid gap-6 lg:grid-cols-[280px_1fr]">
+        <aside class="space-y-6">
+          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/40">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="text-lg font-semibold text-white">Menu</h2>
+              <span id="syncBadge" class="inline-block rounded-full bg-rose-500/10 px-3 py-1 text-xs font-semibold text-rose-300">Offline</span>
+            </div>
+            <div class="mt-5 space-y-3">
+              <button class="section-btn w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-left text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300" data-section="dashboard">Dashboard</button>
+              <button class="section-btn w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-left text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300" data-section="transaksi">Transaksi</button>
+              <button class="section-btn w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-left text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300" data-section="inventaris">Inventaris</button>
+              <button class="section-btn w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-left text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300" data-section="ocr">Faktur AI</button>
+              <button class="section-btn w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-left text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300" data-section="excel">Upload Excel</button>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/40">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="text-lg font-semibold text-white">Status Sinkronisasi</h2>
+            </div>
+            <p id="syncStatus" class="mt-4 text-sm text-slate-400">Offline / localStorage</p>
+            <p class="mt-4 text-sm leading-6 text-slate-400">Jika URL Google Apps Script dikonfigurasi, data akan mencoba disinkronisasi dua arah. Jika tidak tersedia, aplikasi tetap berjalan penuh di browser.</p>
+          </div>
+        </aside>
+
+        <section class="space-y-6">
+          <!-- Dashboard Section -->
+          <div id="dashboard" class="space-y-6">
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-5 shadow-xl shadow-slate-950/20">
+                <p class="text-xs uppercase tracking-[0.24em] text-emerald-400">Penjualan Hari Ini</p>
+                <p id="dailySales" class="mt-3 text-2xl font-bold text-white">Rp 0</p>
+              </div>
+              <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-5 shadow-xl shadow-slate-950/20">
+                <p class="text-xs uppercase tracking-[0.24em] text-emerald-400">Penjualan Minggu Ini</p>
+                <p id="weeklySales" class="mt-3 text-2xl font-bold text-white">Rp 0</p>
+              </div>
+              <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-5 shadow-xl shadow-slate-950/20">
+                <p class="text-xs uppercase tracking-[0.24em] text-emerald-400">Transaksi Hari Ini</p>
+                <p id="todayTxCount" class="mt-3 text-2xl font-bold text-white">0</p>
+              </div>
+              <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-5 shadow-xl shadow-slate-950/20">
+                <p class="text-xs uppercase tracking-[0.24em] text-rose-400">Stok Rendah</p>
+                <p id="lowStockCount" class="mt-3 text-2xl font-bold text-white">0 Produk</p>
+              </div>
+            </div>
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <h3 class="text-lg font-semibold text-white">Produk Stok Rendah</h3>
+              <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                  <thead class="bg-slate-900/50">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">No</th>
+                      <th class="px-4 py-3 font-semibold">Nama Produk</th>
+                      <th class="px-4 py-3 font-semibold">Qty</th>
+                      <th class="px-4 py-3 font-semibold">Persentase</th>
+                    </tr>
+                  </thead>
+                  <tbody id="lowStockTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction Section -->
+          <div id="transaksi" class="hidden space-y-6">
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="grid gap-4 lg:grid-cols-[1fr_320px]">
+                <div class="space-y-4">
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <label class="block text-sm text-slate-300">ID Transaksi<input id="transactionId" type="text" disabled class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none" /></label>
+                    <label class="block text-sm text-slate-300">Waktu Transaksi<input id="transactionTime" type="text" disabled class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none" /></label>
+                  </div>
+                  <label class="block text-sm text-slate-300">Nama Customer<input id="customerName" type="text" list="customerList" placeholder="Nama atau pilih dari daftar" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" /><datalist id="customerList"></datalist></label>
+                  <div class="grid gap-3 sm:grid-cols-3">
+                    <label class="block text-sm text-slate-300">Nama Barang<input id="itemName" type="text" list="inventoryList" placeholder="Pilih barang" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" /><datalist id="inventoryList"></datalist></label>
+                    <label class="block text-sm text-slate-300">Harga<input id="itemPrice" type="text" disabled class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none" /></label>
+                    <label class="block text-sm text-slate-300">Qty<input id="itemQty" type="number" min="1" value="1" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" /></label>
+                  </div>
+                  <div class="grid gap-2 sm:grid-cols-2">
+                    <label class="block text-sm text-slate-300">Total Item<input id="itemTotal" type="text" disabled class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none" /></label>
+                    <button id="btnAddItem" class="mt-2 rounded-2xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">+ Tambah Item</button>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-3 rounded-3xl border border-slate-800 bg-slate-950/90 p-4">
+                  <label class="block text-sm font-semibold text-slate-300">Grand Total<input id="grandTotal" type="text" disabled class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900 px-3 py-2 text-lg font-bold text-emerald-300 outline-none" /></label>
+                  <button id="btnSaveTransaction" class="w-full rounded-2xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">Simpan Transaksi</button>
+                </div>
+              </div>
+            </div>
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h3 class="text-lg font-semibold text-white">Daftar Belanja</h3>
+              </div>
+              <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                  <thead class="bg-slate-900/50">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">No</th>
+                      <th class="px-4 py-3 font-semibold">Nama</th>
+                      <th class="px-4 py-3 font-semibold">Qty</th>
+                      <th class="px-4 py-3 font-semibold">Harga</th>
+                      <th class="px-4 py-3 font-semibold">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cartTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Section -->
+          <div id="inventaris" class="hidden space-y-6">
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">Daftar Inventaris</h3>
+                  <p class="mt-1 text-sm text-slate-400">Klik pada sel untuk mengedit data (hanya text dan angka).</p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row">
+                  <input id="searchInventory" type="text" placeholder="Cari produk atau kategori..." class="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-2 text-slate-100 outline-none focus:border-emerald-400" />
+                  <button id="btnOpenAddItem" class="rounded-2xl bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400">+ Tambah Barang</button>
+                </div>
+              </div>
+              <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                  <thead class="bg-slate-900/50">
+                    <tr>
+                      <th class="px-4 py-3 font-semibold">No</th>
+                      <th class="px-4 py-3 font-semibold cursor-pointer hover:text-emerald-400" data-sort="name">Nama Barang</th>
+                      <th class="px-4 py-3 font-semibold cursor-pointer hover:text-emerald-400" data-sort="category">Kategori</th>
+                      <th class="px-4 py-3 font-semibold cursor-pointer hover:text-emerald-400" data-sort="priceBuy">Harga Beli</th>
+                      <th class="px-4 py-3 font-semibold cursor-pointer hover:text-emerald-400" data-sort="priceSell">Harga Jual</th>
+                      <th class="px-4 py-3 font-semibold cursor-pointer hover:text-emerald-400" data-sort="qty">Qty</th>
+                      <th class="px-4 py-3 font-semibold">Total Nilai</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTable"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- OCR Section -->
+          <div id="ocr" class="hidden space-y-6">
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-white">OCR Invoice / Faktur AI</h3>
+                  <p class="mt-1 text-sm text-slate-400">Unggah gambar faktur untuk ekstraksi data otomatis.</p>
+                </div>
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 transition hover:border-emerald-400">
+                  <i data-lucide="upload" class="w-4 h-4"></i>
+                  <span>Unggah Faktur</span>
+                  <input id="uploadInvoice" type="file" accept="image/*" class="hidden" />
+                </label>
+              </div>
+              <div id="ocrPreview" class="mt-6 hidden rounded-3xl border border-emerald-500/20 bg-slate-950/90 p-5">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h4 class="font-semibold text-emerald-300">Hasil Ekstraksi</h4>
+                    <p class="mt-1 text-sm text-slate-400">Periksa data sebelum mengimpor ke inventory.</p>
+                  </div>
+                  <div class="flex flex-col gap-2 sm:flex-row">
+                    <button id="btnCancelOcr" class="rounded-2xl border border-slate-700 bg-slate-950 px-4 py-2 text-slate-200 transition hover:border-rose-500">Batal</button>
+                    <button id="btnConfirmOcr" class="rounded-2xl bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400">Impor ke Inventory</button>
+                  </div>
+                </div>
+                <div class="mt-5 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                  <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                    <thead class="bg-slate-900/50">
+                      <tr>
+                        <th class="px-4 py-3 font-semibold">Nama</th>
+                        <th class="px-4 py-3 font-semibold">Kategori</th>
+                        <th class="px-4 py-3 font-semibold">Harga Beli</th>
+                        <th class="px-4 py-3 font-semibold">Harga Jual</th>
+                        <th class="px-4 py-3 font-semibold">Qty</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ocrTable"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="ocrLoading" class="mt-6 hidden rounded-3xl border border-emerald-500/20 bg-slate-950/90 p-5 text-center text-emerald-300">
+                <p class="text-lg font-semibold">AI sedang membaca faktur...</p>
+                <p class="mt-2 text-sm text-slate-400">Mohon tunggu sebentar, data akan segera ditampilkan.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Excel Section -->
+          <div id="excel" class="hidden space-y-6">
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="grid gap-6 lg:grid-cols-3">
+                <div class="rounded-3xl border border-slate-800/70 bg-slate-950/90 p-5">
+                  <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Download Template</p>
+                  <h3 class="mt-2 text-lg font-semibold text-white">Format Excel</h3>
+                  <p class="mt-3 text-sm text-slate-400">Unduh template kosong sebagai panduan data upload.</p>
+                  <button id="btnDownloadTemplate" class="mt-5 w-full rounded-2xl bg-emerald-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">Download Template</button>
+                </div>
+                <div class="rounded-3xl border border-slate-800/70 bg-slate-950/90 p-5">
+                  <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Upload Excel</p>
+                  <h3 class="mt-2 text-lg font-semibold text-white">Tambah data inventaris</h3>
+                  <p class="mt-3 text-sm text-slate-400">Gunakan struktur kolom yang sesuai untuk upload cepat.</p>
+                  <input id="uploadExcel" type="file" accept=".xlsx,.xls" class="mt-5 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none" />
+                </div>
+                <div class="rounded-3xl border border-slate-800/70 bg-slate-950/90 p-5">
+                  <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Unduh Laporan</p>
+                  <h3 class="mt-2 text-lg font-semibold text-white">Ekspor Inventory & Transaksi</h3>
+                  <div class="mt-5 space-y-3">
+                    <button id="btnDownloadInventory" class="w-full rounded-2xl bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400">📊 Inventory</button>
+                    <button id="btnDownloadToday" class="w-full rounded-2xl bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400">📈 Hari Ini</button>
+                    <button id="btnDownloadWeekly" class="w-full rounded-2xl bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400">📊 Minggu Ini</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div id="toastContainer" class="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex flex-col gap-3"></div>
+
+    <div id="modalSettings" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 px-4 py-8">
+      <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white">Pengaturan Sinkronisasi</h2>
+            <p class="mt-2 text-sm text-slate-400">Masukkan URL Web App Google Apps Script untuk sinkronisasi dua arah.</p>
+          </div>
+          <button id="btnCloseSettings" class="rounded-full border border-slate-700 bg-slate-950 p-2 text-slate-200 transition hover:border-rose-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="mt-6 grid gap-4">
+          <label class="block text-sm font-medium text-slate-300">URL Web App Google Apps Script</label>
+          <input id="gsheetUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" />
+          <p class="text-sm text-slate-400">Jika tidak diisi, aplikasi akan menggunakan localStorage sebagai fallback.</p>
+          <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <button id="btnSaveSettings" class="rounded-2xl bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">Simpan</button>
+            <button id="btnCancelSettings" class="rounded-2xl border border-slate-700 bg-slate-950 px-5 py-3 text-slate-200 transition hover:border-rose-500">Batal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Module imports -->
+    <script type="module">
+      import './js/app.js';
+    </script>
+  </body>
+</html>
