@@ -2,10 +2,10 @@
 import { generateTransactionId, showToast, updateTime } from './utils.js';
 import { state, loadState, saveState } from './state.js';
 import { renderDashboard, renderSyncStatus } from './dashboard.js';
-import { renderCustomerList, renderCart, setupTransactionHandlers } from './transaksi.js';
-import { renderInventoryOptions, renderInventoryTable, setupInventoryHandlers } from './inventory.js';
-import { setupOcrHandlers } from './ocr.js';
-import { setupExcelHandlers } from './excel.js';
+import { renderCustomerList, renderCart, setupTransactionHandlers, handleItemNameChange, handleQtyFocus, handleQtyChange, addItemToCart, saveTransaction } from './transaksi.js';
+import { renderInventoryOptions, renderInventoryTable, setupInventoryHandlers, openAddItemModal, sortInventory } from './inventory.js';
+import { setupOcrHandlers, processInvoice, confirmOcrImport, cancelOcr } from './ocr.js';
+import { setupExcelHandlers, handleExcelUpload, downloadTemplate, downloadInventory, downloadTransactions } from './excel.js';
 
 function setupSectionNavigation() {
   document.querySelectorAll('.section-btn').forEach((button) => {
@@ -59,6 +59,109 @@ function setupSettingsModal() {
   }
 }
 
+function attachEventDelegation() {
+  document.body.addEventListener('click', (event) => {
+    const button = event.target.closest('button');
+    const sectionButton = event.target.closest('.section-btn');
+    const sortButton = event.target.closest('[data-sort]');
+    if (sectionButton) {
+      const sectionId = sectionButton.dataset.section;
+      document.querySelectorAll('main section.space-y-6 > div').forEach((section) => section.classList.add('hidden'));
+      document.getElementById(sectionId)?.classList.remove('hidden');
+      return;
+    }
+    if (sortButton) {
+      const prop = sortButton.dataset.sort;
+      if (prop) sortInventory(prop);
+      return;
+    }
+    if (!button) return;
+
+    switch (button.id) {
+      case 'btnSettings':
+        document.getElementById('modalSettings')?.classList.remove('hidden');
+        break;
+      case 'btnCloseSettings':
+      case 'btnCancelSettings':
+        document.getElementById('modalSettings')?.classList.add('hidden');
+        break;
+      case 'btnSaveSettings':
+        {
+          const gsheetUrl = document.getElementById('gsheetUrl');
+          if (gsheetUrl) {
+            state.settings.googleSheetURL = gsheetUrl.value.trim();
+            saveState();
+            renderSyncStatus();
+            document.getElementById('modalSettings')?.classList.add('hidden');
+            showToast('Pengaturan tersimpan.');
+          }
+        }
+        break;
+      case 'btnAddItem':
+        addItemToCart();
+        break;
+      case 'btnSaveTransaction':
+        saveTransaction();
+        break;
+      case 'btnOpenAddItem':
+        openAddItemModal();
+        break;
+      case 'btnConfirmOcr':
+        confirmOcrImport();
+        break;
+      case 'btnCancelOcr':
+        cancelOcr();
+        break;
+      case 'btnDownloadTemplate':
+        downloadTemplate();
+        break;
+      case 'btnDownloadInventory':
+        downloadInventory();
+        break;
+      case 'btnDownloadToday':
+        downloadTransactions('daily');
+        break;
+      case 'btnDownloadWeekly':
+        downloadTransactions('weekly');
+        break;
+      default:
+        break;
+    }
+  });
+
+  document.body.addEventListener('input', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+
+    if (target.id === 'itemName') {
+      handleItemNameChange();
+    }
+    if (target.id === 'itemQty') {
+      handleQtyChange();
+    }
+  });
+
+  document.body.addEventListener('focusin', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (target.id === 'itemQty') {
+      handleQtyFocus();
+    }
+  });
+
+  document.body.addEventListener('change', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    if (target.id === 'uploadInvoice' && target.files?.[0]) {
+      processInvoice(target.files[0]);
+    }
+    if (target.id === 'uploadExcel' && target.files?.[0]) {
+      handleExcelUpload(target.files[0]);
+      target.value = '';
+    }
+  });
+}
+
 function renderAll() {
   renderCustomerList();
   renderInventoryOptions();
@@ -107,6 +210,7 @@ export async function initializeApp() {
     setupInventoryHandlers();
     setupOcrHandlers();
     setupExcelHandlers();
+    attachEventDelegation();
 
     // Setup navigation and settings
     setupSectionNavigation();
