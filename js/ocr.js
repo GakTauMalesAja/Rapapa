@@ -120,16 +120,13 @@ export function cancelOcr() {
 
 export function setupOcrHandlers() {
   const uploadInvoice = document.getElementById('uploadInvoice');
-  const btnConfirmOcr = document.getElementById('btnConfirmOcr');
-  const btnCancelOcr = document.getElementById('btnCancelOcr');
   
+  // Button handlers are now delegated through attachEventDelegation()
+  // Keep file input handler
   if (uploadInvoice) {
     uploadInvoice.addEventListener('change', (event) => {
       const file = event.target.files?.[0];
       if (file) processInvoice(file);
     });
   }
-  
-  if (btnConfirmOcr) btnConfirmOcr.addEventListener('click', confirmOcrImport);
-  if (btnCancelOcr) btnCancelOcr.addEventListener('click', cancelOcr);
 }

@@ -158,13 +158,11 @@ export function saveTransaction() {
 }
 
 export function setupTransactionHandlers() {
-  const btnAddItem = document.getElementById('btnAddItem');
-  const btnSaveTransaction = document.getElementById('btnSaveTransaction');
   const itemName = document.getElementById('itemName');
   const itemQty = document.getElementById('itemQty');
   
-  if (btnAddItem) btnAddItem.addEventListener('click', addItemToCart);
-  if (btnSaveTransaction) btnSaveTransaction.addEventListener('click', saveTransaction);
+  // Button handlers are now delegated through attachEventDelegation()
+  // Only keep input event handlers here
   if (itemName) itemName.addEventListener('input', handleItemNameChange);
   if (itemQty) {
     itemQty.addEventListener('focus', handleQtyFocus);

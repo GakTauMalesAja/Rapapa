@@ -151,11 +151,9 @@ export function downloadTransactions(period = 'daily') {
 
 export function setupExcelHandlers() {
   const uploadExcel = document.getElementById('uploadExcel');
-  const btnDownloadTemplate = document.getElementById('btnDownloadTemplate');
-  const btnDownloadInventory = document.getElementById('btnDownloadInventory');
-  const btnDownloadToday = document.getElementById('btnDownloadToday');
-  const btnDownloadWeekly = document.getElementById('btnDownloadWeekly');
   
+  // Button handlers are now delegated through attachEventDelegation()
+  // Keep file input handler
   if (uploadExcel) {
     uploadExcel.addEventListener('change', (event) => {
       const file = event.target.files?.[0];
@@ -165,9 +163,4 @@ export function setupExcelHandlers() {
       }
     });
   }
-  
-  if (btnDownloadTemplate) btnDownloadTemplate.addEventListener('click', downloadTemplate);
-  if (btnDownloadInventory) btnDownloadInventory.addEventListener('click', downloadInventory);
-  if (btnDownloadToday) btnDownloadToday.addEventListener('click', () => downloadTransactions('daily'));
-  if (btnDownloadWeekly) btnDownloadWeekly.addEventListener('click', () => downloadTransactions('weekly'));
 }

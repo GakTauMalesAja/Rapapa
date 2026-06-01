@@ -8,68 +8,13 @@ import { setupOcrHandlers, processInvoice, confirmOcrImport, cancelOcr } from '.
 import { setupExcelHandlers, handleExcelUpload, downloadTemplate, downloadInventory, downloadTransactions } from './excel.js';
 
 function setupSectionNavigation() {
-  const sectionButtons = document.querySelectorAll('.section-btn');
-  console.log(`Found ${sectionButtons.length} section buttons`);
-  
-  sectionButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const sectionId = button.dataset.section;
-      console.log(`Navigation: switching to section ${sectionId}`);
-      
-      // Hide all sections
-      ['dashboard', 'transaksi', 'inventaris', 'ocr', 'excel'].forEach((id) => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-      
-      // Show selected section
-      const selectedSection = document.getElementById(sectionId);
-      if (selectedSection) {
-        selectedSection.classList.remove('hidden');
-      } else {
-        console.warn(`Section ${sectionId} not found`);
-      }
-    });
-  });
+  // Section navigation is now handled by attachEventDelegation()
+  console.log('Section navigation setup handled by event delegation');
 }
 
 function setupSettingsModal() {
-  const btnSettings = document.getElementById('btnSettings');
-  const btnCloseSettings = document.getElementById('btnCloseSettings');
-  const btnCancelSettings = document.getElementById('btnCancelSettings');
-  const btnSaveSettings = document.getElementById('btnSaveSettings');
-  const gsheetUrl = document.getElementById('gsheetUrl');
-  const modalSettings = document.getElementById('modalSettings');
-  
-  if (btnSettings) {
-    btnSettings.addEventListener('click', () => {
-      if (modalSettings) modalSettings.classList.remove('hidden');
-    });
-  }
-  
-  if (btnCloseSettings) {
-    btnCloseSettings.addEventListener('click', () => {
-      if (modalSettings) modalSettings.classList.add('hidden');
-    });
-  }
-  
-  if (btnCancelSettings) {
-    btnCancelSettings.addEventListener('click', () => {
-      if (modalSettings) modalSettings.classList.add('hidden');
-    });
-  }
-  
-  if (btnSaveSettings) {
-    btnSaveSettings.addEventListener('click', () => {
-      if (gsheetUrl) {
-        state.settings.googleSheetURL = gsheetUrl.value.trim();
-        saveState();
-        renderSyncStatus();
-        if (modalSettings) modalSettings.classList.add('hidden');
-        showToast('Pengaturan tersimpan.');
-      }
-    });
-  }
+  // Settings modal buttons are now handled by attachEventDelegation()
+  console.log('Settings modal setup handled by event delegation');
 }
 
 function attachEventDelegation() {
@@ -106,6 +51,25 @@ function attachEventDelegation() {
     if (!button) return;
 
     switch (button.id) {
+      case 'btnSettings':
+        document.getElementById('modalSettings')?.classList.remove('hidden');
+        break;
+      case 'btnCloseSettings':
+      case 'btnCancelSettings':
+        document.getElementById('modalSettings')?.classList.add('hidden');
+        break;
+      case 'btnSaveSettings':
+        {
+          const gsheetUrl = document.getElementById('gsheetUrl');
+          if (gsheetUrl) {
+            state.settings.googleSheetURL = gsheetUrl.value.trim();
+            saveState();
+            renderSyncStatus();
+            document.getElementById('modalSettings')?.classList.add('hidden');
+            showToast('Pengaturan tersimpan.');
+          }
+        }
+        break;
       case 'btnAddItem':
         addItemToCart();
         break;
@@ -139,6 +103,7 @@ function attachEventDelegation() {
           if (filterInput) {
             filterInput.value = '';
             renderDashboardTransactions();
+            showToast('Filter tanggal direset. Menampilkan semua transaksi.');
           }
         }
         break;

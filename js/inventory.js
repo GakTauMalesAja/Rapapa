@@ -155,14 +155,10 @@ export function openAddItemModal() {
 
 export function setupInventoryHandlers() {
   const searchInventory = document.getElementById('searchInventory');
-  const btnOpenAddItem = document.getElementById('btnOpenAddItem');
   
+  // Button handlers are now delegated through attachEventDelegation()
+  // Keep search input and contenteditable handlers
   if (searchInventory) searchInventory.addEventListener('input', renderInventoryTable);
-  if (btnOpenAddItem) btnOpenAddItem.addEventListener('click', openAddItemModal);
-  
-  document.querySelectorAll('[data-sort]').forEach((button) => {
-    button.addEventListener('click', () => sortInventory(button.dataset.sort));
-  });
   
   document.addEventListener('focusout', (event) => {
     const targetCell = event.target.closest('td[contenteditable="true"]');
