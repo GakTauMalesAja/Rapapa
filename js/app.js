@@ -8,14 +8,27 @@ import { setupOcrHandlers, processInvoice, confirmOcrImport, cancelOcr } from '.
 import { setupExcelHandlers, handleExcelUpload, downloadTemplate, downloadInventory, downloadTransactions } from './excel.js';
 
 function setupSectionNavigation() {
-  document.querySelectorAll('.section-btn').forEach((button) => {
+  const sectionButtons = document.querySelectorAll('.section-btn');
+  console.log(`Found ${sectionButtons.length} section buttons`);
+  
+  sectionButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      document.querySelectorAll('main section.space-y-6 > div').forEach((section) => {
-        section.classList.add('hidden');
-      });
       const sectionId = button.dataset.section;
-      const section = document.getElementById(sectionId);
-      if (section) section.classList.remove('hidden');
+      console.log(`Navigation: switching to section ${sectionId}`);
+      
+      // Hide all sections
+      ['dashboard', 'transaksi', 'inventaris', 'ocr', 'excel'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      
+      // Show selected section
+      const selectedSection = document.getElementById(sectionId);
+      if (selectedSection) {
+        selectedSection.classList.remove('hidden');
+      } else {
+        console.warn(`Section ${sectionId} not found`);
+      }
     });
   });
 }
@@ -64,39 +77,35 @@ function attachEventDelegation() {
     const button = event.target.closest('button');
     const sectionButton = event.target.closest('.section-btn');
     const sortButton = event.target.closest('[data-sort]');
+    
+    // Handle section buttons
     if (sectionButton) {
       const sectionId = sectionButton.dataset.section;
-      document.querySelectorAll('main section.space-y-6 > div').forEach((section) => section.classList.add('hidden'));
-      document.getElementById(sectionId)?.classList.remove('hidden');
+      if (!sectionId) return;
+      
+      // Hide all sections
+      ['dashboard', 'transaksi', 'inventaris', 'ocr', 'excel'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+      
+      // Show selected section
+      const selectedSection = document.getElementById(sectionId);
+      if (selectedSection) {
+        selectedSection.classList.remove('hidden');
+      }
       return;
     }
+    
     if (sortButton) {
       const prop = sortButton.dataset.sort;
       if (prop) sortInventory(prop);
       return;
     }
+    
     if (!button) return;
 
     switch (button.id) {
-      case 'btnSettings':
-        document.getElementById('modalSettings')?.classList.remove('hidden');
-        break;
-      case 'btnCloseSettings':
-      case 'btnCancelSettings':
-        document.getElementById('modalSettings')?.classList.add('hidden');
-        break;
-      case 'btnSaveSettings':
-        {
-          const gsheetUrl = document.getElementById('gsheetUrl');
-          if (gsheetUrl) {
-            state.settings.googleSheetURL = gsheetUrl.value.trim();
-            saveState();
-            renderSyncStatus();
-            document.getElementById('modalSettings')?.classList.add('hidden');
-            showToast('Pengaturan tersimpan.');
-          }
-        }
-        break;
       case 'btnAddItem':
         addItemToCart();
         break;
@@ -185,14 +194,20 @@ function attachEventDelegation() {
 }
 
 function renderAll() {
-  renderCustomerList();
-  renderInventoryOptions();
-  renderCart();
-  renderInventoryTable();
-  renderDashboard();
-  renderDashboardTransactions();
-  renderCustomerSummary();
-  renderSyncStatus();
+  console.log('Rendering all views...');
+  
+  try {
+    renderCustomerList();
+    renderInventoryOptions();
+    renderCart();
+    renderInventoryTable();
+    renderDashboard();
+    renderDashboardTransactions();
+    renderCustomerSummary();
+    renderSyncStatus();
+  } catch (error) {
+    console.warn('Error during renderAll:', error);
+  }
   
   const gsheetUrl = document.getElementById('gsheetUrl');
   if (gsheetUrl) gsheetUrl.value = state.settings.googleSheetURL || '';
@@ -204,12 +219,18 @@ function renderAll() {
   
   // Refresh Lucide icons after render
   if (typeof lucide !== 'undefined' && lucide.createIcons) {
-    lucide.createIcons();
+    try {
+      lucide.createIcons();
+    } catch (error) {
+      console.warn('Error recreating Lucide icons:', error);
+    }
   }
 }
 
 export async function initializeApp() {
   try {
+    console.log('Initializing Rapapa app...');
+    
     let lucideLib = typeof lucide !== 'undefined' ? lucide : null;
     if (!lucideLib) {
       try {
@@ -221,15 +242,18 @@ export async function initializeApp() {
 
     if (lucideLib?.createIcons) {
       lucideLib.createIcons();
+      console.log('Lucide icons initialized');
     } else {
       console.warn('Lucide icons not available; continuing without icon initialization.');
     }
 
     // Load state from storage
     loadState();
+    console.log('State loaded');
 
     // Render all views
     renderAll();
+    console.log('All views rendered');
 
     // Setup time update interval
     setInterval(updateTime, 1000);
@@ -240,16 +264,18 @@ export async function initializeApp() {
     setupOcrHandlers();
     setupExcelHandlers();
     attachEventDelegation();
+    console.log('Event handlers setup complete');
 
     // Setup navigation and settings
     setupSectionNavigation();
     setupSettingsModal();
+    console.log('Navigation and settings setup complete');
 
-    console.log('Rapapa POS & Inventory app initialized successfully!');
+    console.log('✓ Rapapa POS & Inventory app initialized successfully!');
   } catch (error) {
-    console.error('Rapapa initialization failed:', error);
+    console.error('✗ Rapapa initialization failed:', error);
   }
-}
+}}
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {

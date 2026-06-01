@@ -71,6 +71,7 @@ export function renderCustomerSummary() {
     .join('') || '<tr><td class="px-4 py-6 text-slate-400" colspan="4">Tidak ada data customer.</td></tr>';
 }
 
+export function renderDashboardTransactions(filterDate = '') {
   const dashboardTransactionsTable = document.getElementById('dashboardTransactionsTable');
   const transactions = getTransactionsByDate(filterDate);
 
@@ -90,6 +91,7 @@ export function renderCustomerSummary() {
     `)
     .join('') || '<tr><td class="px-4 py-6 text-slate-400" colspan="5">Tidak ada transaksi untuk tanggal ini.</td></tr>';
 }
+
 
 export function renderTransactionDetail(transactionId) {
   const detailModal = document.getElementById('modalTransactionDetail');
