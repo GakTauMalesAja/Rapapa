@@ -1,6 +1,7 @@
 // OCR/Invoice module
 import { formatRupiah, showToast, findInventoryItem } from './utils.js';
 import { state, saveState } from './state.js';
+import { renderInventoryOptions, renderInventoryTable } from './inventory.js';
 
 export function showOcrLoading() {
   const ocrPreview = document.getElementById('ocrPreview');
@@ -94,6 +95,8 @@ export function confirmOcrImport() {
   });
   
   saveState();
+  renderInventoryTable();
+  renderInventoryOptions();
   
   const ocrPreview = document.getElementById('ocrPreview');
   if (ocrPreview) ocrPreview.classList.add('hidden');

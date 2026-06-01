@@ -1,6 +1,8 @@
 // Transaction module
 import { formatRupiah, generateTransactionId, showToast, findInventoryItem, updateTime } from './utils.js';
 import { state, saveState, syncWithGoogleSheets } from './state.js';
+import { renderInventoryOptions, renderInventoryTable } from './inventory.js';
+import { renderDashboard } from './dashboard.js';
 
 export function renderCustomerList() {
   const known = [...new Set(state.transactions.map((tx) => tx.customer).filter(Boolean))];
@@ -128,7 +130,11 @@ export function saveTransaction() {
   state.transactions.push(transaction);
   saveState();
   
+  state.cart = [];
   renderCart();
+  renderInventoryTable();
+  renderInventoryOptions();
+  renderDashboard();
   if (customerName) customerName.value = '';
   const itemName = document.getElementById('itemName');
   if (itemName) itemName.value = '';
@@ -146,9 +152,6 @@ export function saveTransaction() {
       showToast('Sinkronisasi transaksi berhasil.');
     }
   });
-  
-  state.cart = [];
-  renderCart();
 }
 
 export function setupTransactionHandlers() {

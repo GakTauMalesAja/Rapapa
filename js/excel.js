@@ -1,6 +1,7 @@
 // Excel module
 import { formatRupiah, formatDate, showToast, findInventoryItem } from './utils.js';
 import { state, saveState } from './state.js';
+import { renderInventoryOptions, renderInventoryTable } from './inventory.js';
 
 export function validateExcelHeaders(headers) {
   const expected = ['No', 'Nama Barang', 'Kategori', 'Harga Beli', 'Qty'];
@@ -53,6 +54,8 @@ export function handleExcelUpload(file) {
     });
     
     saveState();
+    renderInventoryTable();
+    renderInventoryOptions();
     showToast('Data Excel berhasil diproses dan disimpan ke inventory.');
   };
   reader.readAsArrayBuffer(file);
