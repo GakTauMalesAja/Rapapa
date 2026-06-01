@@ -76,31 +76,53 @@ function renderAll() {
   updateTime();
 }
 
-export function initializeApp() {
-  // Initialize lucide icons
-  lucide.createIcons();
-  
-  // Load state from storage
-  loadState();
-  
-  // Render all views
-  renderAll();
-  
-  // Setup time update interval
-  setInterval(updateTime, 1000);
-  
-  // Setup event handlers for each module
-  setupTransactionHandlers();
-  setupInventoryHandlers();
-  setupOcrHandlers();
-  setupExcelHandlers();
-  
-  // Setup navigation and settings
-  setupSectionNavigation();
-  setupSettingsModal();
-  
-  console.log('Rapapa POS & Inventory app initialized successfully!');
+export async function initializeApp() {
+  try {
+    let lucideLib = typeof lucide !== 'undefined' ? lucide : null;
+    if (!lucideLib) {
+      try {
+        lucideLib = await import('https://cdn.jsdelivr.net/npm/lucide@0.394.0/dist/lucide.esm.js');
+      } catch (loadError) {
+        console.warn('Lucide module import failed:', loadError);
+      }
+    }
+
+    if (lucideLib?.createIcons) {
+      lucideLib.createIcons();
+    } else {
+      console.warn('Lucide icons not available; continuing without icon initialization.');
+    }
+
+    // Load state from storage
+    loadState();
+
+    // Render all views
+    renderAll();
+
+    // Setup time update interval
+    setInterval(updateTime, 1000);
+
+    // Setup event handlers for each module
+    setupTransactionHandlers();
+    setupInventoryHandlers();
+    setupOcrHandlers();
+    setupExcelHandlers();
+
+    // Setup navigation and settings
+    setupSectionNavigation();
+    setupSettingsModal();
+
+    console.log('Rapapa POS & Inventory app initialized successfully!');
+  } catch (error) {
+    console.error('Rapapa initialization failed:', error);
+  }
 }
 
 // Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', initializeApp);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeApp().catch((error) => console.error('Initialization failed:', error));
+  });
+} else {
+  initializeApp().catch((error) => console.error('Initialization failed:', error));
+}

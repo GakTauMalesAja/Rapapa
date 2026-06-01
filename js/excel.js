@@ -9,6 +9,11 @@ export function validateExcelHeaders(headers) {
 }
 
 export function handleExcelUpload(file) {
+  if (typeof XLSX === 'undefined') {
+    showToast('Library XLSX tidak tersedia. Excel tidak dapat diproses.', 'error');
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = (event) => {
     const workbook = XLSX.read(event.target.result, { type: 'array' });
@@ -69,12 +74,20 @@ export function createWorkbook(rows, sheetName = 'Sheet1') {
 }
 
 export function downloadTemplate() {
+  if (typeof XLSX === 'undefined') {
+    showToast('Library XLSX tidak tersedia. Tidak dapat mengunduh template.', 'error');
+    return;
+  }
   const workbook = createWorkbook([['No', 'Nama Barang', 'Kategori', 'Harga Beli', 'Qty']]);
   XLSX.writeFile(workbook, 'template-inventory.xlsx');
   showToast('Template berhasil diunduh.');
 }
 
 export function downloadInventory() {
+  if (typeof XLSX === 'undefined') {
+    showToast('Library XLSX tidak tersedia. Tidak dapat mengunduh inventory.', 'error');
+    return;
+  }
   const rows = [
     ['No', 'Nama Barang', 'Kategori', 'Harga Beli', 'Harga Jual', 'Qty', 'Total Nilai']
   ].concat(
@@ -126,6 +139,10 @@ export function downloadTransactions(period = 'daily') {
     });
   });
   
+  if (typeof XLSX === 'undefined') {
+    showToast('Library XLSX tidak tersedia. Tidak dapat mengunduh laporan.', 'error');
+    return;
+  }
   const workbook = createWorkbook(rows);
   const name = period === 'daily' ? 'transaksi-harian.xlsx' : 'transaksi-mingguan.xlsx';
   XLSX.writeFile(workbook, name);

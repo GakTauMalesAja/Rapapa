@@ -109,7 +109,9 @@ export function openAddItemModal() {
   `;
   
   document.body.appendChild(modal);
-  lucide.createIcons({ parent: modal });
+  if (typeof lucide !== 'undefined' && lucide?.createIcons) {
+    lucide.createIcons({ parent: modal });
+  }
   
   const closeBtn = modal.querySelector('#closeAddItem');
   const cancelBtn = modal.querySelector('#cancelAddItem');

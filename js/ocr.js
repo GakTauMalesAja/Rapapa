@@ -44,6 +44,11 @@ export function renderOcrPreview() {
 
 export function processInvoice(file) {
   showOcrLoading();
+  if (typeof setTimeout !== 'function') {
+    hideOcrLoading();
+    showToast('Fitur faktur AI tidak tersedia di lingkungan ini.', 'error');
+    return;
+  }
   const existing = state.inventory.slice(0, 3);
   
   setTimeout(() => {
