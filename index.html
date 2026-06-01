@@ -16,6 +16,10 @@
           <h1 class="text-2xl font-semibold text-emerald-400">RáPáPA</h1>
         </div>
         <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 px-3 py-2">
+            <i id="syncIcon" data-lucide="wifi-off" class="w-4 h-4 text-rose-300"></i>
+            <span id="syncStatusBadge" class="text-xs font-medium text-rose-300">Offline</span>
+          </div>
           <button id="btnSettings" class="inline-flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 px-4 py-2 text-slate-200 transition hover:border-emerald-500 hover:text-emerald-300">
             <i data-lucide="settings" class="w-4 h-4"></i>
             <span>Pengaturan</span>
@@ -43,16 +47,7 @@
             </div>
           </div>
 
-          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/90 p-5 shadow-xl shadow-slate-950/40">
-            <div class="flex items-center justify-between gap-3">
-              <div>
-                <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Status Sinkronisasi</p>
-                <h3 id="syncStatus" class="mt-1 text-base font-semibold text-slate-100">Offline / localStorage</h3>
-              </div>
-              <span id="syncBadge" class="rounded-full bg-emerald-500/10 px-3 py-1 text-sm text-emerald-300">Offline</span>
-            </div>
-            <p class="mt-4 text-sm leading-6 text-slate-400">Jika URL Google Apps Script dikonfigurasi, data akan mencoba disinkronisasi dua arah. Jika tidak tersedia, aplikasi tetap berjalan penuh di browser.</p>
-          </div>
+
         </aside>
 
         <section class="space-y-6">
@@ -96,17 +91,16 @@
                 </table>
               </div>
             </div>
-          </div>
 
-          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
-            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Ringkasan Customer</p>
-                <h2 class="mt-2 text-xl font-semibold text-white">Total Transaksi per Pelanggan</h2>
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Ringkasan Customer</p>
+                  <h2 class="mt-2 text-xl font-semibold text-white">Total Transaksi per Pelanggan</h2>
+                </div>
               </div>
-            </div>
-            <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
-              <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+              <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
                 <thead class="bg-slate-900/90 text-slate-400">
                   <tr>
                     <th class="px-4 py-3">No</th>
@@ -118,34 +112,36 @@
                 <tbody id="customerSummaryTable" class="divide-y divide-slate-800 bg-slate-950"></tbody>
               </table>
             </div>
-          </div>
-
-          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
-              <div>
-                <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Riwayat Transaksi</p>
-                <h2 class="mt-2 text-xl font-semibold text-white">Semua Customer</h2>
-              </div>
-              <div class="grid gap-3 sm:grid-cols-[220px_auto]">
-                <label class="block text-sm text-slate-300">
-                  Pilih Tanggal
-                  <input id="transactionDateFilter" type="date" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" />
-                </label>
-                <button id="btnResetTransactionDate" class="rounded-2xl bg-slate-800 px-4 py-3 text-slate-100 transition hover:bg-slate-700">Reset</button>
-              </div>
             </div>
-            <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
-              <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
-                <thead class="bg-slate-900/90 text-slate-400">
-                  <tr>
-                    <th class="px-4 py-3">No</th>
-                    <th class="px-4 py-3">Tanggal</th>
-                    <th class="px-4 py-3">Customer</th>
-                    <th class="px-4 py-3">Total</th>
-                    <th class="px-4 py-3">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboardTransactionsTable" class="divide-y divide-slate-800 bg-slate-950"></tbody>
-              </table>
+
+            <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Riwayat Transaksi</p>
+                  <h2 class="mt-2 text-xl font-semibold text-white">Semua Customer</h2>
+                </div>
+                <div class="flex gap-3 items-end">
+                  <label class="block text-sm text-slate-300">
+                    Pilih Tanggal
+                    <input id="transactionDateFilter" type="date" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" />
+                  </label>
+                  <button id="btnResetTransactionDate" class="rounded-2xl bg-slate-800 px-5 py-3 text-slate-100 transition hover:bg-slate-700 whitespace-nowrap font-medium">Reset</button>
+                </div>
+              </div>
+              <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+                <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                  <thead class="bg-slate-900/90 text-slate-400">
+                    <tr>
+                      <th class="px-4 py-3">No</th>
+                      <th class="px-4 py-3">Tanggal</th>
+                      <th class="px-4 py-3">Customer</th>
+                      <th class="px-4 py-3">Total</th>
+                      <th class="px-4 py-3">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardTransactionsTable" class="divide-y divide-slate-800 bg-slate-950"></tbody>
+                </table>
+              </div>
             </div>
           </div>
 

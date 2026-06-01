@@ -201,6 +201,11 @@ function renderAll() {
   if (transactionId) transactionId.value = generateTransactionId();
   
   updateTime();
+  
+  // Refresh Lucide icons after render
+  if (typeof lucide !== 'undefined' && lucide.createIcons) {
+    lucide.createIcons();
+  }
 }
 
 export async function initializeApp() {

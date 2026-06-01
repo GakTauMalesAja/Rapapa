@@ -152,23 +152,31 @@ export function renderDashboard() {
 }
 
 export function renderSyncStatus() {
-  const syncStatus = document.getElementById('syncStatus');
-  const syncBadge = document.getElementById('syncBadge');
+  const syncStatusBadge = document.getElementById('syncStatusBadge');
+  const syncIcon = document.getElementById('syncIcon');
   const url = state.settings.googleSheetURL?.trim();
   
   if (url) {
-    if (syncStatus) syncStatus.textContent = 'Terhubung ke Google Apps Script';
-    if (syncBadge) {
-      syncBadge.textContent = 'Online';
-      syncBadge.classList.remove('bg-rose-500/10', 'text-rose-300');
-      syncBadge.classList.add('bg-emerald-500/10', 'text-emerald-300');
+    if (syncStatusBadge) {
+      syncStatusBadge.textContent = 'Online';
+      syncStatusBadge.classList.remove('text-rose-300');
+      syncStatusBadge.classList.add('text-emerald-300');
+    }
+    if (syncIcon) {
+      syncIcon.setAttribute('data-lucide', 'wifi');
+      syncIcon.classList.remove('text-rose-300');
+      syncIcon.classList.add('text-emerald-300');
     }
   } else {
-    if (syncStatus) syncStatus.textContent = 'Offline / localStorage';
-    if (syncBadge) {
-      syncBadge.textContent = 'Offline';
-      syncBadge.classList.remove('bg-emerald-500/10', 'text-emerald-300');
-      syncBadge.classList.add('bg-rose-500/10', 'text-rose-300');
+    if (syncStatusBadge) {
+      syncStatusBadge.textContent = 'Offline';
+      syncStatusBadge.classList.remove('text-emerald-300');
+      syncStatusBadge.classList.add('text-rose-300');
+    }
+    if (syncIcon) {
+      syncIcon.setAttribute('data-lucide', 'wifi-off');
+      syncIcon.classList.remove('text-emerald-300');
+      syncIcon.classList.add('text-rose-300');
     }
   }
 }
