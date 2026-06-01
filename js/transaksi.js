@@ -2,7 +2,7 @@
 import { formatRupiah, generateTransactionId, showToast, findInventoryItem, updateTime } from './utils.js';
 import { state, saveState, syncWithGoogleSheets } from './state.js';
 import { renderInventoryOptions, renderInventoryTable } from './inventory.js';
-import { renderDashboard } from './dashboard.js';
+import { renderDashboard, renderDashboardTransactions, renderCustomerSummary } from './dashboard.js';
 
 export function renderCustomerList() {
   const known = [...new Set(state.transactions.map((tx) => tx.customer).filter(Boolean))];
@@ -135,6 +135,9 @@ export function saveTransaction() {
   renderInventoryTable();
   renderInventoryOptions();
   renderDashboard();
+  renderDashboardTransactions();
+  renderCustomerSummary();
+  renderCustomerList();
   if (customerName) customerName.value = '';
   const itemName = document.getElementById('itemName');
   if (itemName) itemName.value = '';

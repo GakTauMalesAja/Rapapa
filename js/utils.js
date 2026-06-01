@@ -3,8 +3,22 @@ export function formatRupiah(value) {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value || 0);
 }
 
-export function formatDate(date) {
+export function formatDate(date, format = '') {
   const d = new Date(date);
+  if (format === 'yyyy-MM-dd') {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  if (format === 'dd MMM yyyy') {
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  if (format === 'dd MMM yyyy, HH:mm') {
+    const tanggal = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    const waktu = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    return `${tanggal}, ${waktu}`;
+  }
   const hari = d.toLocaleDateString('id-ID', { weekday: 'long' });
   const tanggal = d.toLocaleDateString('id-ID');
   const waktu = d.toLocaleTimeString('id-ID');

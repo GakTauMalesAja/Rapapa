@@ -1,7 +1,7 @@
 // Main app initialization
 import { generateTransactionId, showToast, updateTime } from './utils.js';
 import { state, loadState, saveState } from './state.js';
-import { renderDashboard, renderSyncStatus } from './dashboard.js';
+import { renderDashboard, renderSyncStatus, renderDashboardTransactions, renderTransactionDetail, renderCustomerSummary } from './dashboard.js';
 import { renderCustomerList, renderCart, setupTransactionHandlers, handleItemNameChange, handleQtyFocus, handleQtyChange, addItemToCart, saveTransaction } from './transaksi.js';
 import { renderInventoryOptions, renderInventoryTable, setupInventoryHandlers, openAddItemModal, sortInventory } from './inventory.js';
 import { setupOcrHandlers, processInvoice, confirmOcrImport, cancelOcr } from './ocr.js';
@@ -124,8 +124,27 @@ function attachEventDelegation() {
       case 'btnDownloadWeekly':
         downloadTransactions('weekly');
         break;
+      case 'btnResetTransactionDate':
+        {
+          const filterInput = document.getElementById('transactionDateFilter');
+          if (filterInput) {
+            filterInput.value = '';
+            renderDashboardTransactions();
+          }
+        }
+        break;
+      case 'btnCloseTransactionDetail':
+      case 'btnCloseTransactionDetailFooter':
+        document.getElementById('modalTransactionDetail')?.classList.add('hidden');
+        break;
       default:
         break;
+    }
+
+    const transactionId = button.dataset.transactionId;
+    if (transactionId) {
+      renderTransactionDetail(transactionId);
+      return;
     }
   });
 
@@ -159,6 +178,9 @@ function attachEventDelegation() {
       handleExcelUpload(target.files[0]);
       target.value = '';
     }
+    if (target.id === 'transactionDateFilter') {
+      renderDashboardTransactions(target.value);
+    }
   });
 }
 
@@ -168,6 +190,8 @@ function renderAll() {
   renderCart();
   renderInventoryTable();
   renderDashboard();
+  renderDashboardTransactions();
+  renderCustomerSummary();
   renderSyncStatus();
   
   const gsheetUrl = document.getElementById('gsheetUrl');

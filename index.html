@@ -98,6 +98,57 @@
             </div>
           </div>
 
+          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Ringkasan Customer</p>
+                <h2 class="mt-2 text-xl font-semibold text-white">Total Transaksi per Pelanggan</h2>
+              </div>
+            </div>
+            <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+              <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                <thead class="bg-slate-900/90 text-slate-400">
+                  <tr>
+                    <th class="px-4 py-3">No</th>
+                    <th class="px-4 py-3">Customer</th>
+                    <th class="px-4 py-3">Jumlah Transaksi</th>
+                    <th class="px-4 py-3">Total Nilai</th>
+                  </tr>
+                </thead>
+                <tbody id="customerSummaryTable" class="divide-y divide-slate-800 bg-slate-950"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
+              <div>
+                <p class="text-sm uppercase tracking-[0.24em] text-emerald-400">Riwayat Transaksi</p>
+                <h2 class="mt-2 text-xl font-semibold text-white">Semua Customer</h2>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-[220px_auto]">
+                <label class="block text-sm text-slate-300">
+                  Pilih Tanggal
+                  <input id="transactionDateFilter" type="date" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none focus:border-emerald-400" />
+                </label>
+                <button id="btnResetTransactionDate" class="rounded-2xl bg-slate-800 px-4 py-3 text-slate-100 transition hover:bg-slate-700">Reset</button>
+              </div>
+            </div>
+            <div class="mt-6 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+              <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+                <thead class="bg-slate-900/90 text-slate-400">
+                  <tr>
+                    <th class="px-4 py-3">No</th>
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Customer</th>
+                    <th class="px-4 py-3">Total</th>
+                    <th class="px-4 py-3">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="dashboardTransactionsTable" class="divide-y divide-slate-800 bg-slate-950"></tbody>
+              </table>
+            </div>
+          </div>
+
           <div id="transaksi" class="hidden space-y-6">
             <div class="rounded-3xl border border-slate-800/70 bg-slate-900/80 p-6 shadow-xl shadow-slate-950/20">
               <div class="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -293,6 +344,47 @@
     </main>
 
     <div id="toastContainer" class="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex flex-col gap-3"></div>
+
+    <div id="modalTransactionDetail" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 px-4 py-8">
+      <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-semibold text-white">Detail Transaksi</h2>
+            <p id="detailTransactionDate" class="mt-1 text-sm text-slate-400"></p>
+          </div>
+          <button id="btnCloseTransactionDetail" class="rounded-full border border-slate-700 bg-slate-950 p-2 text-slate-200 transition hover:border-rose-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="mt-6 grid gap-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-4">
+              <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Customer</p>
+              <p id="detailCustomerName" class="mt-2 text-lg font-semibold text-white"></p>
+            </div>
+            <div class="rounded-3xl border border-slate-800 bg-slate-950 p-4">
+              <p class="text-sm uppercase tracking-[0.24em] text-slate-400">Total Transaksi</p>
+              <p id="detailTransactionTotal" class="mt-2 text-lg font-semibold text-white"></p>
+            </div>
+          </div>
+          <div class="overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/90">
+            <table class="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
+              <thead class="bg-slate-900/90 text-slate-400">
+                <tr>
+                  <th class="px-4 py-3">Produk</th>
+                  <th class="px-4 py-3">Qty</th>
+                  <th class="px-4 py-3">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody id="detailTransactionItems" class="divide-y divide-slate-800 bg-slate-950"></tbody>
+            </table>
+          </div>
+          <div class="flex justify-end">
+            <button id="btnCloseTransactionDetailFooter" class="rounded-2xl bg-emerald-500 px-5 py-3 font-semibold text-slate-950 transition hover:bg-emerald-400">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div id="modalSettings" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/70 px-4 py-8">
       <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900 p-6 shadow-2xl shadow-slate-950/40">
