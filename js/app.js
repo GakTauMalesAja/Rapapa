@@ -240,7 +240,7 @@ export async function initializeApp() {
   } catch (error) {
     console.error('✗ Rapapa initialization failed:', error);
   }
-}}
+}
 
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
